@@ -23,38 +23,36 @@ import javax.crypto.spec.PBEKeySpec;
 
 public class LibraryManagementSystem {
 
-    // Logger for debugging
+
     private static final Logger log = Logger.getLogger(LibraryManagementSystem.class.getName());
 
-    // Data structures for books, patrons, and loans
+
     private final List<Book> bookInventory = new ArrayList<>();
     private final List<Patron> patrons = new ArrayList<>();
     private final Map<Integer, List<Book>> borrowedBooks = new HashMap<>();
 
-    // HashMap indices for optimized search
+
     private final Map<String, List<Book>> bookTitleIndex = new HashMap<>();
     private final Map<String, List<Book>> bookAuthorIndex = new HashMap<>();
     private final Map<Integer, Patron> patronIndex = new HashMap<>();
 
-    // Scanner for user input from console
+
     private final Scanner scanner = new Scanner(System.in);
 
-    // File names for data persistence
+
     private final String BOOKS_FILE = "library/books.txt";
     private final String PATRONS_FILE = "library/patrons.txt";
     private final String LIBRARIANS_FILE = "library/librarians.txt";
 
-    // Constructor
+
     public LibraryManagementSystem() {
         log.info("Library Management System initialized.");
         loadBooksFromFile();
         loadPatronsFromFile();
-        // Note: librarians.txt will be created when a librarian signs up
+
     }
 
-    // ------------------------------
-    // Main method
-    // ------------------------------
+
     public static void main(String[] args) {
         LibraryManagementSystem manager = new LibraryManagementSystem();
         manager.authenticateLibrarian(); // librarian login/signup
@@ -63,7 +61,7 @@ public class LibraryManagementSystem {
     }
 
     // ------------------------------
-    // Menu method
+    // Menu 
     // ------------------------------
     private void runMenu() {
         while (true) {
@@ -132,9 +130,7 @@ public class LibraryManagementSystem {
         }
     }
 
-    // ------------------------------
-    // Librarian Authentication Methods
-    // ------------------------------
+
     private void authenticateLibrarian() {
         while (true) {
             System.out.println("\n--- Librarian Authentication ---");
@@ -146,7 +142,7 @@ public class LibraryManagementSystem {
                 signupLibrarian();
             } else if (choice.equals("2")) {
                 if (loginLibrarian()) {
-                    break; // Successful login
+                    break;
                 } else {
                     System.out.println("Login failed. Please try again.");
                 }
@@ -180,7 +176,7 @@ public class LibraryManagementSystem {
             int iterations = 10000;
             int keyLength = 256;
             String hashed = hashPassword(password.toCharArray(), salt, iterations, keyLength);
-            // Save record: email|saltHex|hashedPassword
+
             try (PrintWriter pw = new PrintWriter(new FileWriter(LIBRARIANS_FILE, true))) {
                 pw.println(email + "|" + toHex(salt) + "|" + hashed);
             }
@@ -240,15 +236,15 @@ public class LibraryManagementSystem {
                 }
             }
         } catch (IOException e) {
-            // File may not exist yet, so no librarian exists
+
             return false;
         }
         return false;
     }
 
-    // ------------------------------
-    // Password Hashing Helpers (using PBKDF2WithHmacSHA256)
-    // ------------------------------
+
+    // Password Hashing Helpers (PBKDF2WithHmacSHA256)
+
     private static byte[] getSalt() throws NoSuchAlgorithmException {
         SecureRandom sr = SecureRandom.getInstanceStrong();
         byte[] salt = new byte[16];
@@ -280,14 +276,14 @@ public class LibraryManagementSystem {
         return bytes;
     }
 
-    // ------------------------------
-    // File operations for Books
-    // ------------------------------
+
+
+
     private void loadBooksFromFile() {
         try (BufferedReader br = new BufferedReader(new FileReader(BOOKS_FILE))) {
             String line;
             while ((line = br.readLine()) != null) {
-                // Expected format: title|author|isbn|copies
+
                 String[] parts = line.split("\\|");
                 if (parts.length == 4) {
                     String title = parts[0];
@@ -307,7 +303,7 @@ public class LibraryManagementSystem {
     private void saveBooksToFile() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(BOOKS_FILE))) {
             for (Book b : bookInventory) {
-                // Write each book record in the format: title|author|isbn|copies
+
                 pw.println(b.getTitle() + "|" + b.getAuthor() + "|" + b.getIsbn() + "|" + b.getCopies());
             }
         } catch (IOException e) {
@@ -315,9 +311,7 @@ public class LibraryManagementSystem {
         }
     }
 
-    // ------------------------------
-    // File operations for Patrons
-    // ------------------------------
+
     private void loadPatronsFromFile() {
         try (BufferedReader br = new BufferedReader(new FileReader(PATRONS_FILE))) {
             String line;
@@ -341,7 +335,8 @@ public class LibraryManagementSystem {
     private void savePatronsToFile() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(PATRONS_FILE))) {
             for (Patron p : patrons) {
-                // Write each patron record in the format: id|name|contact
+
+
                 pw.println(p.getId() + "|" + p.getName() + "|" + p.getContact());
             }
         } catch (IOException e) {
@@ -349,9 +344,11 @@ public class LibraryManagementSystem {
         }
     }
 
-    // ------------------------------
-    // Methods for Books management
-    // ------------------------------
+
+
+
+
+
     public void addBook() {
         try {
             System.out.println("Ingrese el título del libro:");
@@ -360,7 +357,7 @@ public class LibraryManagementSystem {
             String author = scanner.nextLine();
             System.out.println("Ingrese el ISBN del libro:");
             String isbn = scanner.nextLine();
-            // Verify duplicate ISBN
+
             for (Book bk : bookInventory) {
                 if (bk.getIsbn().equalsIgnoreCase(isbn)) {
                     System.out.println("Ya existe un libro con el ISBN " + isbn + ". Operación cancelada.");
@@ -380,7 +377,6 @@ public class LibraryManagementSystem {
         }
     }
 
-    // Helper to update hash indices for books
     private void addBookToIndices(Book book) {
         String titleKey = book.getTitle().toLowerCase();
         bookTitleIndex.computeIfAbsent(titleKey, _ -> new ArrayList<>()).add(book);
@@ -388,7 +384,6 @@ public class LibraryManagementSystem {
         bookAuthorIndex.computeIfAbsent(authorKey, _ -> new ArrayList<>()).add(book);
     }
 
-    // Rebuild indices (used after modifications/deletions)
     private void rebuildBookIndices() {
         bookTitleIndex.clear();
         bookAuthorIndex.clear();
@@ -415,7 +410,6 @@ public class LibraryManagementSystem {
             System.out.println("No se encontró un libro con ese título.");
             return;
         }
-        // Using hash index to find matching books
         List<Book> booksToRemove = bookTitleIndex.get(titleKey);
         Book bookToRemove = null;
         if (booksToRemove.size() == 1) {
@@ -490,7 +484,7 @@ public class LibraryManagementSystem {
         saveBooksToFile();
     }
 
-    // Optimized search for books using hash indices (by title or author)
+
     public void searchBook() {
         System.out.println("Ingrese el título o autor del libro a buscar:");
         String query = scanner.nextLine().toLowerCase();
@@ -510,9 +504,7 @@ public class LibraryManagementSystem {
         }
     }
 
-    // ------------------------------
-    // Methods for Patrons management
-    // ------------------------------
+
     public void registerPatron() {
         try {
             System.out.println("Ingrese el nombre del usuario:");
@@ -607,7 +599,6 @@ public class LibraryManagementSystem {
         savePatronsToFile();
     }
 
-    // Optimized search for patrons (by ID)
     public void searchPatron() {
         System.out.println("Ingrese el ID del usuario a buscar:");
         int id;
@@ -655,9 +646,6 @@ public class LibraryManagementSystem {
         }
     }
 
-    // ------------------------------
-    // Methods for Borrowing and Returning Books
-    // ------------------------------
     public void borrowBook() {
         try {
             System.out.println("Ingrese el ID del usuario:");
