@@ -62,7 +62,7 @@ Data persistence is implemented via text files:
 1. **Clone the repository:**
 
    ```bash
-   git clone <URL_of_your_repository>
+   git clone https://github.com/marcheluki/JavaDevBookLibrary.git
    ```
 
 2. **Navigate to the project directory:**
