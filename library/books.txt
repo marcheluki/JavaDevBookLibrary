@@ -1,15 +1,15 @@
 To Kill a Mockingbird|Harper Lee|9780061120084|10
 1984|George Orwell|9780451524935|8
-The Great Gatsby|F. Scott Fitzgerald|9780743273565|5
-Brave New World|Aldous Huxley|9780060850524|7
-Moby Dick|Herman Melville|9781503280786|4
-Pride and Prejudice|Jane Austen|9781503290563|6
-The Catcher in the Rye|J.D. Salinger|9780316769488|8
-The Lord of the Rings|J.R.R. Tolkien|9780261102385|9
-Harry Potter and the Sorcerer's Stone|J.K. Rowling|9780590353427|12
-The Hobbit|J.R.R. Tolkien|9780547928227|10
-Fahrenheit 451|Ray Bradbury|9781451673319|7
-Animal Farm|George Orwell|9780451526342|9
-The Chronicles of Narnia|C.S. Lewis|9780064471190|8
-The Da Vinci Code|Dan Brown|9780307474278|10
+The Great Gatsby|F. Scott Fitzgerald|9780743273565|3
+Brave New World|Aldous Huxley|9780060850524|5
+Moby Dick|Herman Melville|9781503280786|3
+Pride and Prejudice|Jane Austen|9781503290563|4
+The Catcher in the Rye|J.D. Salinger|9780316769488|7
+The Lord of the Rings|J.R.R. Tolkien|9780261102385|3
+Harry Potter and the Sorcerer's Stone|J.K. Rowling|9780590353427|9
+The Hobbit|J.R.R. Tolkien|9780547928227|8
+Fahrenheit 451|Ray Bradbury|9781451673319|6
+Animal Farm|George Orwell|9780451526342|8
+The Chronicles of Narnia|C.S. Lewis|9780064471190|6
+The Da Vinci Code|Dan Brown|9780307474278|9
 A Tale of Two Cities|Charles Dickens|9780486406510|7

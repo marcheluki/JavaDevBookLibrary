@@ -55,8 +55,26 @@ public class LibraryManagementSystem {
 
     public static void main(String[] args) {
         LibraryManagementSystem manager = new LibraryManagementSystem();
-        manager.authenticateLibrarian(); // librarian login/signup
-        manager.runMenu();
+        manager.authenticateLibrarian();
+        
+        System.out.println("\n¿Desea ejecutar en modo simulación? (s/n)");
+        String choice = manager.scanner.nextLine().toLowerCase();
+        
+        if (choice.equals("s")) {
+            System.out.println("Ingrese el número de usuarios para la simulación:");
+            int numberOfPatrons = Integer.parseInt(manager.scanner.nextLine());
+            manager.startSimulation(numberOfPatrons);
+            
+            // Keep the main thread alive
+            try {
+                Thread.sleep(Long.MAX_VALUE);
+            } catch (InterruptedException e) {
+                System.out.println("Simulation interrupted");
+            }
+        } else {
+            manager.runMenu();
+        }
+        
         System.out.println("Gracias por utilizar el Sistema de Biblioteca.");
     }
 
@@ -316,13 +334,12 @@ public class LibraryManagementSystem {
         try (BufferedReader br = new BufferedReader(new FileReader(PATRONS_FILE))) {
             String line;
             while ((line = br.readLine()) != null) {
-                // Expected format: id|name|contact
                 String[] parts = line.split("\\|");
                 if (parts.length == 3) {
                     int id = Integer.parseInt(parts[0]);
                     String name = parts[1];
                     String contact = parts[2];
-                    Patron patron = new Patron(name, id, contact);
+                    Patron patron = new Patron(name, id, contact, this, 0);
                     patrons.add(patron);
                     patronIndex.put(id, patron);
                 }
@@ -517,7 +534,7 @@ public class LibraryManagementSystem {
             }
             System.out.println("Ingrese el contacto del usuario:");
             String contact = scanner.nextLine();
-            Patron newPatron = new Patron(name, id, contact);
+            Patron newPatron = new Patron(name, id, contact, this, 0);
             patrons.add(newPatron);
             patronIndex.put(id, newPatron);
             System.out.println("Usuario registrado exitosamente!");
@@ -652,22 +669,7 @@ public class LibraryManagementSystem {
             int id = Integer.parseInt(scanner.nextLine());
             System.out.println("Ingrese el título del libro a prestar:");
             String title = scanner.nextLine();
-            Book target = null;
-            for (Book b : bookInventory) {
-                if (b.getTitle().equalsIgnoreCase(title) && b.getCopies() > 0) {
-                    target = b;
-                    break;
-                }
-            }
-            if (target == null) {
-                System.out.println("Libro no disponible.");
-                return;
-            }
-            borrowedBooks.putIfAbsent(id, new ArrayList<>());
-            borrowedBooks.get(id).add(target);
-            target.setCopies(target.getCopies() - 1);
-            System.out.println("Libro prestado con éxito.");
-            saveBooksToFile();
+            borrowBook(title, id);
         } catch (NumberFormatException e) {
             log.log(Level.SEVERE, "Error al parsear el ID del usuario.", e);
             System.out.println("ID inválido. Operación cancelada.");
@@ -678,32 +680,143 @@ public class LibraryManagementSystem {
         try {
             System.out.println("Ingrese el ID del usuario:");
             int id = Integer.parseInt(scanner.nextLine());
-            if (borrowedBooks.containsKey(id) && !borrowedBooks.get(id).isEmpty()) {
-                List<Book> list = borrowedBooks.get(id);
-                System.out.println("Libros prestados actualmente para el usuario con ID " + id + ":");
-                for (Book b : list) {
-                    b.display();
-                }
-                System.out.println("Ingrese el título del libro a devolver:");
-                String title = scanner.nextLine();
-                Iterator<Book> it = list.iterator();
-                while (it.hasNext()) {
-                    Book b = it.next();
-                    if (b.getTitle().equalsIgnoreCase(title)) {
-                        b.setCopies(b.getCopies() + 1);
-                        it.remove();
-                        System.out.println("Libro devuelto con éxito.");
-                        saveBooksToFile();
-                        return;
-                    }
-                }
-                System.out.println("No se encontró el libro prestado para ese usuario.");
-            } else {
-                System.out.println("El usuario con ID " + id + " no tiene libros prestados.");
-            }
+            System.out.println("Ingrese el título del libro a devolver:");
+            String title = scanner.nextLine();
+            returnBook(title, id);
         } catch (NumberFormatException e) {
             log.log(Level.SEVERE, "Error al parsear el ID del usuario.", e);
             System.out.println("ID inválido. Operación cancelada.");
         }
+    }
+
+    public void startSimulation(int numberOfPatrons) {
+        System.out.println("\n=== Iniciando Simulación ===");
+        System.out.println("Número de usuarios: " + numberOfPatrons);
+        System.out.println("Libros disponibles: " + bookInventory.size());
+        
+        System.out.println("\nIngrese el número de vueltas por usuario (una vuelta = prestar y devolver un libro):");
+        int maxTurns = Integer.parseInt(scanner.nextLine());
+        
+        System.out.println("\nLa simulación comenzará en 3 segundos...");
+        try {
+            Thread.sleep(3000);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        List<Thread> patronThreads = new ArrayList<>();
+        List<Patron> patrons = new ArrayList<>();
+
+        // Create and start patron threads
+        for (int i = 0; i < numberOfPatrons; i++) {
+            Patron patron = new Patron("Patron " + (i + 1), i + 1, "contact" + (i + 1) + "@email.com", this, maxTurns);
+            patrons.add(patron);
+            Thread thread = new Thread(patron);
+            patronThreads.add(thread);
+            thread.start();
+            System.out.println("Usuario " + (i + 1) + " ha entrado a la biblioteca");
+        }
+
+        System.out.println("\n=== Simulación en curso ===");
+        System.out.println("La simulación terminará cuando todos los usuarios completen " + maxTurns + " vueltas");
+        System.out.println("===========================\n");
+
+        // Monitor simulation progress
+        Thread monitorThread = new Thread(() -> {
+            boolean allFinished = false;
+            while (!allFinished) {
+                allFinished = true;
+                for (Patron patron : patrons) {
+                    if (!patron.isFinished()) {
+                        allFinished = false;
+                        break;
+                    }
+                }
+                try {
+                    Thread.sleep(1000);
+                } catch (InterruptedException e) {
+                    break;
+                }
+            }
+            
+            // Stop all threads
+            System.out.println("\n=== Simulación Completada ===");
+            for (Patron patron : patrons) {
+                patron.stop();
+            }
+            for (Thread thread : patronThreads) {
+                try {
+                    thread.join(1000);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+            
+            System.out.println("\nResumen de la simulación:");
+            System.out.println("Usuarios participantes: " + patrons.size());
+            System.out.println("Vueltas completadas por usuario: " + maxTurns);
+            System.out.println("Libros disponibles al final: " + bookInventory.size());
+            System.out.println("===========================");
+            
+            // Exit the program
+            System.exit(0);
+        });
+        
+        monitorThread.start();
+    }
+
+    // Add these getter methods for thread-safe access
+    public synchronized List<Book> getBookInventory() {
+        return new ArrayList<>(bookInventory);
+    }
+
+    public synchronized Map<Integer, List<Book>> getBorrowedBooks() {
+        return new HashMap<>(borrowedBooks);
+    }
+
+    public synchronized boolean borrowBook(String bookTitle, int patronId) {
+        Book target = null;
+        for (Book b : bookInventory) {
+            if (b.getTitle().equalsIgnoreCase(bookTitle) && b.getCopies() > 0) {
+                target = b;
+                break;
+            }
+        }
+        if (target == null) {
+            System.out.println("\n[Simulación] Usuario " + patronId + " intentó prestar el libro '" + bookTitle + "' pero no está disponible.");
+            return false;
+        }
+        borrowedBooks.putIfAbsent(patronId, new ArrayList<>());
+        borrowedBooks.get(patronId).add(target);
+        target.setCopies(target.getCopies() - 1);
+        System.out.println("\n[Simulación] Usuario " + patronId + " prestó exitosamente el libro '" + bookTitle + "'");
+        System.out.println("  - Copias restantes: " + target.getCopies());
+        System.out.println("  - Libros prestados por el usuario: " + borrowedBooks.get(patronId).size());
+        saveBooksToFile();
+        return true;
+    }
+
+    public synchronized boolean returnBook(String bookTitle, int patronId) {
+        if (!borrowedBooks.containsKey(patronId) || borrowedBooks.get(patronId).isEmpty()) {
+            System.out.println("\n[Simulación] Usuario " + patronId + " intentó devolver el libro '" + bookTitle + "' pero no tiene libros prestados.");
+            return false;
+        }
+        
+        List<Book> list = borrowedBooks.get(patronId);
+        Iterator<Book> it = list.iterator();
+        while (it.hasNext()) {
+            Book b = it.next();
+            if (b.getTitle().equalsIgnoreCase(bookTitle)) {
+                b.setCopies(b.getCopies() + 1);
+                it.remove();
+                System.out.println("\n[Simulación] Usuario " + patronId + " devolvió exitosamente el libro '" + bookTitle + "'");
+                System.out.println("  - Copias disponibles: " + b.getCopies());
+                System.out.println("  - Libros prestados por el usuario: " + borrowedBooks.get(patronId).size());
+                saveBooksToFile();
+                return true;
+            }
+        }
+        System.out.println("\n[Simulación] Usuario " + patronId + " intentó devolver el libro '" + bookTitle + "' pero no lo tiene prestado.");
+        return false;
     }
 }
