@@ -707,8 +707,7 @@ public class LibraryManagementSystem {
         List<Thread> patronThreads = new ArrayList<>();
         List<Patron> patrons = new ArrayList<>();
 
-        // Create and start patron threads
-        for (int i = 0; i < numberOfPatrons; i++) {
+        // Create and start patron threads       for (int i = 0; i < numberOfPatrons; i++) {
             Patron patron = new Patron("Patron " + (i + 1), i + 1, "contact" + (i + 1) + "@email.com", this, maxTurns);
             patrons.add(patron);
             Thread thread = new Thread(patron);
@@ -721,7 +720,6 @@ public class LibraryManagementSystem {
         System.out.println("La simulación terminará cuando todos los usuarios completen " + maxTurns + " vueltas");
         System.out.println("===========================\n");
 
-        // Monitor simulation progress
         Thread monitorThread = new Thread(() -> {
             boolean allFinished = false;
             while (!allFinished) {
@@ -739,7 +737,6 @@ public class LibraryManagementSystem {
                 }
             }
             
-            // Stop all threads
             System.out.println("\n=== Simulación Completada ===");
             for (Patron patron : patrons) {
                 patron.stop();

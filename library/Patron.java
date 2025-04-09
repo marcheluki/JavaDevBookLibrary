@@ -77,16 +77,13 @@ public class Patron implements Runnable {
                 // Simulate patron behavior
                 int action;
                 if (!hasBorrowed) {
-                    // If hasn't borrowed, must borrow first
                     action = 0;
                 } else {
-                    // If has borrowed, must return
                     action = 1;
                 }
 
                 switch (action) {
                     case 0:
-                        // Borrow a random book
                         if (!library.getBookInventory().isEmpty()) {
                             int bookIndex = random.nextInt(library.getBookInventory().size());
                             Book book = library.getBookInventory().get(bookIndex);
@@ -99,7 +96,6 @@ public class Patron implements Runnable {
                         }
                         break;
                     case 1:
-                        // Return a book if they have any
                         if (library.getBorrowedBooks().containsKey(this.id) && 
                             !library.getBorrowedBooks().get(this.id).isEmpty()) {
                             List<Book> borrowed = library.getBorrowedBooks().get(this.id);
@@ -117,7 +113,6 @@ public class Patron implements Runnable {
                         break;
                 }
                 
-                // Random delay between actions (1-5 seconds)
                 Thread.sleep(random.nextInt(4000) + 1000);
             } catch (InterruptedException e) {
                 System.out.println("[Simulación] Usuario " + id + " fue interrumpido");
