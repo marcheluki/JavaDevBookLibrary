@@ -1,5 +1,3 @@
-package library;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
@@ -15,65 +13,45 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
-import java.util.logging.Logger;
-import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 import javax.crypto.SecretKeyFactory;
 import javax.crypto.spec.PBEKeySpec;
 
-public class LibraryManagementSystem {
-
-
-    private static final Logger log = Logger.getLogger(LibraryManagementSystem.class.getName());
-
+public class LibraryManagementSystem implements BookManager {
 
     private final List<Book> bookInventory = new ArrayList<>();
     private final List<Patron> patrons = new ArrayList<>();
     private final Map<Integer, List<Book>> borrowedBooks = new HashMap<>();
 
-
     private final Map<String, List<Book>> bookTitleIndex = new HashMap<>();
     private final Map<String, List<Book>> bookAuthorIndex = new HashMap<>();
     private final Map<Integer, Patron> patronIndex = new HashMap<>();
 
-
     private final Scanner scanner = new Scanner(System.in);
 
-
-    private final String BOOKS_FILE = "library/books.txt";
-    private final String PATRONS_FILE = "library/patrons.txt";
-    private final String LIBRARIANS_FILE = "library/librarians.txt";
-
+    private final String BOOKS_FILE = "books.txt";
+    private final String PATRONS_FILE = "patrons.txt";
+    private final String LIBRARIANS_FILE = "librarians.txt";
 
     public LibraryManagementSystem() {
-        log.info("Library Management System initialized.");
+        System.out.println("Library Management System initialized.");
         loadBooksFromFile();
         loadPatronsFromFile();
-
     }
-
 
     public static void main(String[] args) {
         LibraryManagementSystem manager = new LibraryManagementSystem();
         manager.authenticateLibrarian();
         
-        System.out.println("\n¿Desea ejecutar en modo simulación? (s/n)");
-        String choice = manager.scanner.nextLine().toLowerCase();
+        System.out.println("\n-------------------------------------");
+        System.out.println("Bienvenido al Sistema de Biblioteca");
+        System.out.println("Esta versión incluye características de Java 8");
+        System.out.println("como expresiones lambda, referencias a métodos");
+        System.out.println("y métodos por defecto en interfaces");
+        System.out.println("-------------------------------------\n");
         
-        if (choice.equals("s")) {
-            System.out.println("Ingrese el número de usuarios para la simulación:");
-            int numberOfPatrons = Integer.parseInt(manager.scanner.nextLine());
-            manager.startSimulation(numberOfPatrons);
-            
-            // Keep the main thread alive
-            try {
-                Thread.sleep(Long.MAX_VALUE);
-            } catch (InterruptedException e) {
-                System.out.println("Simulation interrupted");
-            }
-        } else {
-            manager.runMenu();
-        }
+        manager.runMenu();
         
         System.out.println("Gracias por utilizar el Sistema de Biblioteca.");
     }
@@ -84,60 +62,211 @@ public class LibraryManagementSystem {
     private void runMenu() {
         while (true) {
             System.out.println("\n--- Menú Principal ---");
-            System.out.println("1) Agregar libro");
-            System.out.println("2) Mostrar libros");
-            System.out.println("3) Eliminar libro");
-            System.out.println("4) Editar libro");
-            System.out.println("5) Buscar libro");
-            System.out.println("6) Registrar usuario");
-            System.out.println("7) Mostrar usuarios");
-            System.out.println("8) Editar usuario");
-            System.out.println("9) Eliminar usuario");
-            System.out.println("10) Buscar usuario");
-            System.out.println("11) Prestar libro");
-            System.out.println("12) Devolver libro");
-            System.out.println("13) Libros por usuario");
+            System.out.println("1) Administración de Libros");
+            System.out.println("2) Mostrar Biblioteca");
+            System.out.println("3) Búsquedas");
+            System.out.println("4) Sistema de Usuarios");
+            System.out.println("5) Sistema de Préstamos");
+            System.out.println("6) Ordenar Libros");
             System.out.println("0) Salir");
             System.out.print("Seleccione una opción: ");
             String choice = scanner.nextLine();
+            
+            switch (choice) {
+                case "1":
+                    bookAdministrationMenu();
+                    break;
+                case "2":
+                    displayLibraryMenu();
+                    break;
+                case "3":
+                    searchMenu();
+                    break;
+                case "4":
+                    userSystemMenu();
+                    break;
+                case "5":
+                    bookLendingMenu();
+                    break;
+                case "6":
+                    sortBooksMenu();
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+    
+    // Book Administration Submenu
+    private void bookAdministrationMenu() {
+        while (true) {
+            System.out.println("\n--- Administración de Libros ---");
+            System.out.println("1) Agregar libro");
+            System.out.println("2) Eliminar libro");
+            System.out.println("3) Editar libro");
+            System.out.println("0) Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+            String choice = scanner.nextLine();
+            
             switch (choice) {
                 case "1":
                     addBook();
                     break;
                 case "2":
-                    displayBooks();
-                    break;
-                case "3":
                     removeBook();
                     break;
-                case "4":
+                case "3":
                     editBook();
                     break;
-                case "5":
-                    searchBook();
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+    
+    // Display Library Submenu
+    private void displayLibraryMenu() {
+        while (true) {
+            System.out.println("\n--- Mostrar Biblioteca ---");
+            System.out.println("1) Mostrar todos los libros");
+            System.out.println("0) Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+            String choice = scanner.nextLine();
+            
+            switch (choice) {
+                case "1":
+                    displayBooks();
                     break;
-                case "6":
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+    
+    // Search Submenu
+    private void searchMenu() {
+        while (true) {
+            System.out.println("\n--- Búsquedas ---");
+            System.out.println("1) Buscar libros por autor");
+            System.out.println("2) Buscar libros por título");
+            System.out.println("3) Buscar libros publicados antes de un año");
+            System.out.println("4) Buscar libros por usuario");
+            System.out.println("0) Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+            String choice = scanner.nextLine();
+            
+            switch (choice) {
+                case "1":
+                    findBooksByAuthorMenu();
+                    break;
+                case "2":
+                    findBooksByTitleContainingMenu();
+                    break;
+                case "3":
+                    findBooksPublishedBeforeMenu();
+                    break;
+                case "4":
+                    booksPerPatron();
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+    
+    // User System Submenu
+    private void userSystemMenu() {
+        while (true) {
+            System.out.println("\n--- Sistema de Usuarios ---");
+            System.out.println("1) Registrar usuario");
+            System.out.println("2) Mostrar usuarios");
+            System.out.println("3) Editar usuario");
+            System.out.println("4) Eliminar usuario");
+            System.out.println("5) Buscar usuario");
+            System.out.println("0) Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+            String choice = scanner.nextLine();
+            
+            switch (choice) {
+                case "1":
                     registerPatron();
                     break;
-                case "7":
+                case "2":
                     displayPatrons();
                     break;
-                case "8":
+                case "3":
                     editPatron();
                     break;
-                case "9":
+                case "4":
                     removePatron();
                     break;
-                case "10":
+                case "5":
                     searchPatron();
                     break;
-                case "11":
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+    
+    // Sort Books Submenu
+    private void sortBooksMenu() {
+        while (true) {
+            System.out.println("\n--- Ordenar Libros ---");
+            System.out.println("1) Ordenar por título");
+            System.out.println("2) Ordenar por año (ascendente)");
+            System.out.println("3) Ordenar por año (descendente)");
+            System.out.println("0) Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+            String choice = scanner.nextLine();
+            
+            switch (choice) {
+                case "1":
+                    sortBooksByTitleMenu();
+                    break;
+                case "2":
+                    sortBooksByYearAscendingMenu();
+                    break;
+                case "3":
+                    sortBooksByYearDescendingMenu();
+                    break;
+                case "0":
+                    return;
+                default:
+                    System.out.println("Opción inválida, intente de nuevo.");
+            }
+        }
+    }
+
+    // Book Lending System Submenu
+    private void bookLendingMenu() {
+        while (true) {
+            System.out.println("\n--- Sistema de Préstamos ---");
+            System.out.println("1) Prestar libro");
+            System.out.println("2) Devolver libro");
+            System.out.println("3) Ver libros prestados por usuario");
+            System.out.println("0) Volver al menú principal");
+            System.out.print("Seleccione una opción: ");
+            String choice = scanner.nextLine();
+            
+            switch (choice) {
+                case "1":
                     borrowBook();
                     break;
-                case "12":
+                case "2":
                     returnBook();
                     break;
-                case "13":
+                case "3":
                     booksPerPatron();
                     break;
                 case "0":
@@ -148,8 +277,7 @@ public class LibraryManagementSystem {
         }
     }
 
-
-    private void authenticateLibrarian() {
+    public void authenticateLibrarian() {
         while (true) {
             System.out.println("\n--- Librarian Authentication ---");
             System.out.println("1) Sign Up");
@@ -254,12 +382,10 @@ public class LibraryManagementSystem {
                 }
             }
         } catch (IOException e) {
-
             return false;
         }
         return false;
     }
-
 
     // Password Hashing Helpers (PBKDF2WithHmacSHA256)
 
@@ -294,41 +420,47 @@ public class LibraryManagementSystem {
         return bytes;
     }
 
-
-
-
     private void loadBooksFromFile() {
         try (BufferedReader br = new BufferedReader(new FileReader(BOOKS_FILE))) {
             String line;
             while ((line = br.readLine()) != null) {
-
                 String[] parts = line.split("\\|");
-                if (parts.length == 4) {
+                if (parts.length >= 4) {
                     String title = parts[0];
                     String author = parts[1];
                     String isbn = parts[2];
                     int copies = Integer.parseInt(parts[3]);
-                    Book book = new Book(title, author, isbn, copies);
+                    
+                    // Handle year field if present, otherwise default to 0
+                    int year = 0;
+                    if (parts.length >= 5) {
+                        try {
+                            year = Integer.parseInt(parts[4]);
+                        } catch (NumberFormatException e) {
+                            System.out.println("Invalid year format for book: " + title);
+                        }
+                    }
+                    
+                    Book book = new Book(title, author, isbn, copies, year);
                     bookInventory.add(book);
                     addBookToIndices(book);
                 }
             }
         } catch (IOException e) {
-            log.log(Level.WARNING, "No se pudo cargar books.txt. Se creará uno nuevo al guardar.", e);
+            System.out.println("No se pudo cargar books.txt. Se creará uno nuevo al guardar.");
         }
     }
 
     private void saveBooksToFile() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(BOOKS_FILE))) {
             for (Book b : bookInventory) {
-
-                pw.println(b.getTitle() + "|" + b.getAuthor() + "|" + b.getIsbn() + "|" + b.getCopies());
+                pw.println(b.getTitle() + "|" + b.getAuthor() + "|" + b.getIsbn() + "|" + 
+                           b.getCopies() + "|" + b.getYear());
             }
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al guardar books.txt.", e);
+            System.out.println("Error al guardar books.txt.");
         }
     }
-
 
     private void loadPatronsFromFile() {
         try (BufferedReader br = new BufferedReader(new FileReader(PATRONS_FILE))) {
@@ -339,32 +471,25 @@ public class LibraryManagementSystem {
                     int id = Integer.parseInt(parts[0]);
                     String name = parts[1];
                     String contact = parts[2];
-                    Patron patron = new Patron(name, id, contact, this, 0);
+                    Patron patron = new Patron(name, id, contact);
                     patrons.add(patron);
                     patronIndex.put(id, patron);
                 }
             }
         } catch (IOException e) {
-            log.log(Level.WARNING, "No se pudo cargar patrons.txt. Se creará uno nuevo al guardar.", e);
+            System.out.println("No se pudo cargar patrons.txt. Se creará uno nuevo al guardar.");
         }
     }
 
     private void savePatronsToFile() {
         try (PrintWriter pw = new PrintWriter(new FileWriter(PATRONS_FILE))) {
             for (Patron p : patrons) {
-
-
                 pw.println(p.getId() + "|" + p.getName() + "|" + p.getContact());
             }
         } catch (IOException e) {
-            log.log(Level.SEVERE, "Error al guardar patrons.txt.", e);
+            System.out.println("Error al guardar patrons.txt.");
         }
     }
-
-
-
-
-
 
     public void addBook() {
         try {
@@ -383,14 +508,32 @@ public class LibraryManagementSystem {
             }
             System.out.println("Ingrese la cantidad de copias disponibles:");
             int copies = Integer.parseInt(scanner.nextLine());
-            Book newBook = new Book(title, author, isbn, copies);
+            
+            System.out.println("Ingrese el año de publicación:");
+            int year = Integer.parseInt(scanner.nextLine());
+            
+            // Ask if it's an eBook
+            System.out.println("¿Es un libro electrónico? (s/n):");
+            String isEbook = scanner.nextLine().toLowerCase();
+            
+            Book newBook;
+            if (isEbook.equals("s")) {
+                System.out.println("Ingrese el tamaño del archivo (MB):");
+                double fileSize = Double.parseDouble(scanner.nextLine());
+                System.out.println("Ingrese el formato (PDF, EPUB, etc.):");
+                String format = scanner.nextLine();
+                newBook = new EBook(title, author, isbn, copies, year, fileSize, format);
+            } else {
+                newBook = new Book(title, author, isbn, copies, year);
+            }
+            
             bookInventory.add(newBook);
             addBookToIndices(newBook);
             saveBooksToFile();
             System.out.println("¡Libro agregado exitosamente!");
         } catch (NumberFormatException e) {
-            log.log(Level.SEVERE, "Error al parsear el número de copias.", e);
-            System.out.println("Cantidad de copias inválida. Operación cancelada.");
+            System.out.println("Error al parsear valores numéricos.");
+            System.out.println("Valor numérico inválido. Operación cancelada.");
         }
     }
 
@@ -451,7 +594,6 @@ public class LibraryManagementSystem {
             loans.removeIf(b -> b.getIsbn().equalsIgnoreCase(finalBookToRemove.getIsbn()));
         }
         System.out.println("Libro eliminado de la biblioteca.");
-        log.info("Libro eliminado: " + bookToRemove.getTitle());
         rebuildBookIndices();
         saveBooksToFile();
     }
@@ -470,23 +612,28 @@ public class LibraryManagementSystem {
             System.out.println("Libro con ISBN " + targetIsbn + " no encontrado.");
             return;
         }
+        
         System.out.println("Valores actuales:");
         target.display();
+        
         System.out.println("Ingrese el nuevo título (o presione ENTER para mantener):");
         String newTitle = scanner.nextLine();
         if (!newTitle.trim().isEmpty()) {
             target.setTitle(newTitle);
         }
+        
         System.out.println("Ingrese el nuevo autor (o presione ENTER para mantener):");
         String newAuthor = scanner.nextLine();
         if (!newAuthor.trim().isEmpty()) {
             target.setAuthor(newAuthor);
         }
+        
         System.out.println("Ingrese el nuevo ISBN (o presione ENTER para mantener):");
         String newIsbn = scanner.nextLine();
         if (!newIsbn.trim().isEmpty()) {
             target.setIsbn(newIsbn);
         }
+        
         System.out.println("Ingrese la nueva cantidad de copias (ingrese -1 para mantener el valor actual):");
         try {
             int newCopies = Integer.parseInt(scanner.nextLine());
@@ -494,53 +641,83 @@ public class LibraryManagementSystem {
                 target.setCopies(newCopies);
             }
         } catch (NumberFormatException e) {
-            log.log(Level.WARNING, "Valor inválido para copias; se mantiene el valor anterior.", e);
+            System.out.println("Valor inválido para copias; se mantiene el valor anterior.");
         }
+        
+        System.out.println("Ingrese el nuevo año de publicación (ingrese -1 para mantener el valor actual):");
+        try {
+            int newYear = Integer.parseInt(scanner.nextLine());
+            if (newYear != -1) {
+                target.setYear(newYear);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Valor inválido para año; se mantiene el valor anterior.");
+        }
+        
+        // Handle EBook specific fields if applicable
+        if (target instanceof EBook) {
+            EBook ebook = (EBook) target;
+            
+            System.out.println("Ingrese el nuevo tamaño de archivo en MB (ingrese -1 para mantener el valor actual):");
+            try {
+                double newFileSize = Double.parseDouble(scanner.nextLine());
+                if (newFileSize != -1) {
+                    ebook.setFileSize(newFileSize);
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Valor inválido para tamaño de archivo; se mantiene el valor anterior.");
+            }
+            
+            System.out.println("Ingrese el nuevo formato (o presione ENTER para mantener):");
+            String newFormat = scanner.nextLine();
+            if (!newFormat.trim().isEmpty()) {
+                ebook.setFormat(newFormat);
+            }
+        }
+        
         System.out.println("Libro actualizado exitosamente!");
         rebuildBookIndices();
         saveBooksToFile();
     }
 
-
     public void searchBook() {
         System.out.println("Ingrese el título o autor del libro a buscar:");
         String query = scanner.nextLine().toLowerCase();
-        Set<Book> results = new HashSet<>();
-        if (bookTitleIndex.containsKey(query)) {
-            results.addAll(bookTitleIndex.get(query));
-        }
-        if (bookAuthorIndex.containsKey(query)) {
-            results.addAll(bookAuthorIndex.get(query));
-        }
+        
+        // Use stream to search for books by title or author
+        List<Book> results = bookInventory.stream()
+            .filter(book -> 
+                book.getTitle().toLowerCase().contains(query) || 
+                book.getAuthor().toLowerCase().contains(query))
+            .collect(Collectors.toList());
+            
         if (results.isEmpty()) {
-            System.out.println("No se encontraron libros que coincidan con ese criterio.");
+            System.out.println("No se encontraron libros que coincidan con la búsqueda: " + query);
         } else {
-            for (Book b : results) {
-                b.display();
-            }
+            System.out.println("\nLibros encontrados con la búsqueda '" + query + "':");
+            results.forEach(book -> book.display());
         }
     }
 
-
     public void registerPatron() {
         try {
-            System.out.println("Ingrese el nombre del usuario:");
-            String name = scanner.nextLine();
-            System.out.println("Ingrese el ID del usuario:");
+            System.out.println("Ingrese el ID numérico para el nuevo usuario:");
             int id = Integer.parseInt(scanner.nextLine());
             if (patronIndex.containsKey(id)) {
-                System.out.println("Ya existe un usuario con el ID " + id + ". Operación cancelada.");
+                System.out.println("Ya existe un usuario con ese ID. Operación cancelada.");
                 return;
             }
-            System.out.println("Ingrese el contacto del usuario:");
+            System.out.println("Ingrese el nombre del usuario:");
+            String name = scanner.nextLine();
+            System.out.println("Ingrese la información de contacto del usuario:");
             String contact = scanner.nextLine();
-            Patron newPatron = new Patron(name, id, contact, this, 0);
+            Patron newPatron = new Patron(name, id, contact);
             patrons.add(newPatron);
             patronIndex.put(id, newPatron);
-            System.out.println("Usuario registrado exitosamente!");
             savePatronsToFile();
+            System.out.println("¡Usuario registrado exitosamente!");
         } catch (NumberFormatException e) {
-            log.log(Level.SEVERE, "Error al parsear el ID del usuario.", e);
+            System.out.println("Error al parsear el ID del usuario.");
             System.out.println("ID inválido. Operación cancelada.");
         }
     }
@@ -561,7 +738,7 @@ public class LibraryManagementSystem {
         try {
             targetId = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            log.log(Level.WARNING, "ID inválido.", e);
+            System.out.println("ID inválido.");
             System.out.println("Operación cancelada.");
             return;
         }
@@ -594,7 +771,7 @@ public class LibraryManagementSystem {
         try {
             id = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            log.log(Level.WARNING, "ID inválido.", e);
+            System.out.println("ID inválido.");
             System.out.println("Operación cancelada.");
             return;
         }
@@ -622,7 +799,7 @@ public class LibraryManagementSystem {
         try {
             id = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            log.log(Level.WARNING, "ID inválido.", e);
+            System.out.println("ID inválido.");
             System.out.println("Operación cancelada.");
             return;
         }
@@ -648,7 +825,7 @@ public class LibraryManagementSystem {
         try {
             id = Integer.parseInt(scanner.nextLine());
         } catch (NumberFormatException e) {
-            log.log(Level.SEVERE, "ID inválido.", e);
+            System.out.println("ID inválido.");
             System.out.println("Operación cancelada.");
             return;
         }
@@ -671,7 +848,7 @@ public class LibraryManagementSystem {
             String title = scanner.nextLine();
             borrowBook(title, id);
         } catch (NumberFormatException e) {
-            log.log(Level.SEVERE, "Error al parsear el ID del usuario.", e);
+            System.out.println("Error al parsear el ID del usuario.");
             System.out.println("ID inválido. Operación cancelada.");
         }
     }
@@ -684,82 +861,14 @@ public class LibraryManagementSystem {
             String title = scanner.nextLine();
             returnBook(title, id);
         } catch (NumberFormatException e) {
-            log.log(Level.SEVERE, "Error al parsear el ID del usuario.", e);
+            System.out.println("Error al parsear el ID del usuario.");
             System.out.println("ID inválido. Operación cancelada.");
         }
     }
 
     public void startSimulation(int numberOfPatrons) {
-        System.out.println("\n=== Iniciando Simulación ===");
-        System.out.println("Número de usuarios: " + numberOfPatrons);
-        System.out.println("Libros disponibles: " + bookInventory.size());
-        
-        System.out.println("\nIngrese el número de vueltas por usuario (una vuelta = prestar y devolver un libro):");
-        int maxTurns = Integer.parseInt(scanner.nextLine());
-        
-        System.out.println("\nLa simulación comenzará en 3 segundos...");
-        try {
-            Thread.sleep(3000);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        List<Thread> patronThreads = new ArrayList<>();
-        List<Patron> patrons = new ArrayList<>();
-
-        // Create and start patron threads       for (int i = 0; i < numberOfPatrons; i++) {
-            Patron patron = new Patron("Patron " + (i + 1), i + 1, "contact" + (i + 1) + "@email.com", this, maxTurns);
-            patrons.add(patron);
-            Thread thread = new Thread(patron);
-            patronThreads.add(thread);
-            thread.start();
-            System.out.println("Usuario " + (i + 1) + " ha entrado a la biblioteca");
-        }
-
-        System.out.println("\n=== Simulación en curso ===");
-        System.out.println("La simulación terminará cuando todos los usuarios completen " + maxTurns + " vueltas");
-        System.out.println("===========================\n");
-
-        Thread monitorThread = new Thread(() -> {
-            boolean allFinished = false;
-            while (!allFinished) {
-                allFinished = true;
-                for (Patron patron : patrons) {
-                    if (!patron.isFinished()) {
-                        allFinished = false;
-                        break;
-                    }
-                }
-                try {
-                    Thread.sleep(1000);
-                } catch (InterruptedException e) {
-                    break;
-                }
-            }
-            
-            System.out.println("\n=== Simulación Completada ===");
-            for (Patron patron : patrons) {
-                patron.stop();
-            }
-            for (Thread thread : patronThreads) {
-                try {
-                    thread.join(1000);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-            
-            System.out.println("\nResumen de la simulación:");
-            System.out.println("Usuarios participantes: " + patrons.size());
-            System.out.println("Vueltas completadas por usuario: " + maxTurns);
-            System.out.println("Libros disponibles al final: " + bookInventory.size());
-            System.out.println("===========================");
-            
-            // Exit the program
-            System.exit(0);
-        });
-        
-        monitorThread.start();
+        System.out.println("La función de simulación está ahora disponible a través de la clase SimulationMain.");
+        System.out.println("Por favor ejecute: java SimulationMain");
     }
 
     // Add these getter methods for thread-safe access
@@ -815,5 +924,148 @@ public class LibraryManagementSystem {
         }
         System.out.println("\n[Simulación] Usuario " + patronId + " intentó devolver el libro '" + bookTitle + "' pero no lo tiene prestado.");
         return false;
+    }
+
+    // --------------------------------
+    // BookManager Interface Methods
+    // --------------------------------
+    
+    @Override
+    public void addBook(Book book) {
+        bookInventory.add(book);
+        addBookToIndices(book);
+        saveBooksToFile();
+    }
+    
+    @Override
+    public List<Book> getBooks() {
+        return new ArrayList<>(bookInventory);
+    }
+    
+    @Override
+    public List<Book> findBooksByAuthor(String author) {
+        // Using lambda expression to filter books by author (partial match)
+        return bookInventory.stream()
+                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+    
+    @Override
+    public List<Book> sortBooksByTitle() {
+        // Using lambda expression to sort books by title
+        return bookInventory.stream()
+                .sorted((b1, b2) -> b1.getTitle().compareTo(b2.getTitle()))
+                .collect(Collectors.toList());
+    }
+    
+    // Additional sorting methods using Java 8 features
+    
+    public List<Book> sortBooksByYearAscending() {
+        return bookInventory.stream()
+                .sorted((b1, b2) -> Integer.compare(b1.getYear(), b2.getYear()))
+                .collect(Collectors.toList());
+    }
+    
+    public List<Book> sortBooksByYearDescending() {
+        return bookInventory.stream()
+                .sorted((b1, b2) -> Integer.compare(b2.getYear(), b1.getYear()))
+                .collect(Collectors.toList());
+    }
+    
+    public List<Book> findBooksPublishedBefore(int year) {
+        return bookInventory.stream()
+                .filter(book -> book.getYear() < year)
+                .collect(Collectors.toList());
+    }
+    
+    public List<Book> findBooksByTitleContaining(String substring) {
+        return bookInventory.stream()
+                .filter(book -> book.getTitle().toLowerCase().contains(substring.toLowerCase()))
+                .collect(Collectors.toList());
+    }
+
+    // New menu methods for Java 8 features
+    
+    private void findBooksByAuthorMenu() {
+        System.out.println("\n--- Buscar Libros por Autor ---");
+        System.out.println("Ingrese el nombre del autor:");
+        String author = scanner.nextLine();
+        
+        List<Book> books = bookInventory.stream()
+                .filter(book -> book.getAuthor().toLowerCase().contains(author.toLowerCase()))
+                .collect(Collectors.toList());
+        
+        if (books.isEmpty()) {
+            System.out.println("No se encontraron libros del autor: " + author);
+        } else {
+            System.out.println("Libros del autor " + author + ":");
+            books.forEach(book -> book.display());
+        }
+    }
+    
+    private void sortBooksByTitleMenu() {
+        System.out.println("\n--- Libros Ordenados por Título ---");
+        List<Book> sortedBooks = sortBooksByTitle();
+        
+        if (sortedBooks.isEmpty()) {
+            System.out.println("No hay libros en la biblioteca.");
+        } else {
+            sortedBooks.forEach(book -> book.display());
+        }
+    }
+    
+    private void sortBooksByYearAscendingMenu() {
+        System.out.println("\n--- Libros Ordenados por Año (Ascendente) ---");
+        List<Book> sortedBooks = sortBooksByYearAscending();
+        
+        if (sortedBooks.isEmpty()) {
+            System.out.println("No hay libros en la biblioteca.");
+        } else {
+            sortedBooks.forEach(book -> book.display());
+        }
+    }
+    
+    private void sortBooksByYearDescendingMenu() {
+        System.out.println("\n--- Libros Ordenados por Año (Descendente) ---");
+        List<Book> sortedBooks = sortBooksByYearDescending();
+        
+        if (sortedBooks.isEmpty()) {
+            System.out.println("No hay libros en la biblioteca.");
+        } else {
+            sortedBooks.forEach(book -> book.display());
+        }
+    }
+    
+    private void findBooksPublishedBeforeMenu() {
+        System.out.println("\n--- Buscar Libros Publicados Antes de un Año ---");
+        System.out.println("Ingrese el año:");
+        try {
+            int year = Integer.parseInt(scanner.nextLine());
+            List<Book> books = findBooksPublishedBefore(year);
+            
+            if (books.isEmpty()) {
+                System.out.println("No se encontraron libros publicados antes del año " + year);
+            } else {
+                System.out.println("Libros publicados antes del año " + year + ":");
+                books.forEach(book -> book.display());
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Año inválido. Operación cancelada.");
+        }
+    }
+    
+    private void findBooksByTitleContainingMenu() {
+        System.out.println("\n--- Buscar Libros por Título ---");
+        System.out.println("Ingrese una palabra o frase para buscar en los títulos:");
+        String substring = scanner.nextLine();
+        
+        List<Book> books = findBooksByTitleContaining(substring);
+        
+        if (books.isEmpty()) {
+            System.out.println("No se encontraron libros con '" + substring + "' en el título");
+        } else {
+            System.out.println("Libros con '" + substring + "' en el título:");
+            books.forEach(book -> book.display());
+        }
     }
 }

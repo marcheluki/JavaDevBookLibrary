@@ -1,5 +1,3 @@
-package library;
-
 import java.util.Random;
 import java.util.List;
 
@@ -24,6 +22,18 @@ public class Patron implements Runnable {
         this.completedTurns = 0;
         this.maxTurns = maxTurns;
         this.hasBorrowed = false;
+    }
+
+    public Patron(String name, int id, String contact) {
+        this.name = name;
+        this.id = id;
+        this.contact = contact;
+        this.random = new Random();
+        this.running = false;
+        this.completedTurns = 0;
+        this.maxTurns = 0;
+        this.hasBorrowed = false;
+        this.library = null;
     }
 
     public String getName() {
