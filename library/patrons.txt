@@ -1,5 +1,0 @@
-1|John Doe|johndoe@example.com
-2|Jane Smith|janesmith@example.com
-3|Robert Brown|robertbrown@example.com
-4|Emily Davis|emilydavis@example.com
-5|Michael Johnson|michaeljohnson@example.com

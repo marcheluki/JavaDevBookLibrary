@@ -1,0 +1,32 @@
+{
+    "java.configuration.updateBuildConfiguration": "automatic",
+    "java.project.sourcePaths": ["src/main/java", "library"],
+    "java.project.outputPath": "target/classes",
+    "java.project.referencedLibraries": [
+        "lib/**/*.jar",
+        "${HOME}/.m2/repository/org/junit/jupiter/junit-jupiter-api/5.8.2/junit-jupiter-api-5.8.2.jar",
+        "${HOME}/.m2/repository/org/junit/jupiter/junit-jupiter-engine/5.8.2/junit-jupiter-engine-5.8.2.jar",
+        "${HOME}/.m2/repository/org/junit/platform/junit-platform-commons/1.8.2/junit-platform-commons-1.8.2.jar",
+        "${HOME}/.m2/repository/org/junit/platform/junit-platform-engine/1.8.2/junit-platform-engine-1.8.2.jar",
+        "${HOME}/.m2/repository/org/junit/platform/junit-platform-launcher/1.8.2/junit-platform-launcher-1.8.2.jar"
+    ],
+    "java.completion.importOrder": [
+        "java",
+        "javax",
+        "org",
+        "com"
+    ],
+    "java.format.settings.url": "eclipse-formatter.xml",
+    "java.project.importHint": false,
+    "editor.formatOnSave": true,
+    "java.format.enabled": true,
+    "java.saveActions.organizeImports": true,
+    "java.configuration.runtimes": [
+        {
+            "name": "JavaSE-23",
+            "path": "${HOME}/.jdks/openjdk-23",
+            "default": true
+        }
+    ],
+    "java.dependency.packagePresentation": "flat"
+} 
