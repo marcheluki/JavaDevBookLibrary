@@ -1,0 +1,3 @@
+com\library\api\controller\BookControllerTest.class
+com\library\api\service\BookServiceTest.class
+com\library\api\repository\BookRepositoryTest.class

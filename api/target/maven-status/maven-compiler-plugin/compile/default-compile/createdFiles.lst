@@ -1,0 +1,6 @@
+com\library\api\service\BookServiceImpl.class
+com\library\api\repository\BookRepository.class
+com\library\api\model\Book.class
+com\library\api\service\BookService.class
+com\library\api\controller\BookController.class
+com\library\api\LibraryApiApplication.class
