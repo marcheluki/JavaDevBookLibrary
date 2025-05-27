@@ -36,19 +36,28 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
 ## Features
 
 - **Book Management:**
-  - View list of all books
+  - View list of all books with a modern bookshelf-style interface
   - View detailed information for each book
-  - Add new books through a modal form
-  - Edit existing books through a modal form
-  - Delete books
+  - Add new books through a modal form with validation
+  - Edit existing books through a modal form:
+    - Pre-filled with current book data
+    - ISBN field is disabled to prevent changes
+    - All other fields (title, author, year, copies) can be modified
+  - Delete books with confirmation
 - **Modern UI:**
   - Built with Material-UI components
   - Responsive design
   - Modal forms for add/edit operations
   - Snackbar notifications for operation feedback
+  - Bookshelf-style list view with visual separation between books
 - **Real-time Updates:**
   - Automatic list refresh after add/update/delete operations
   - No page refresh required
+  - Immediate feedback on operation success/failure
+- **Error Handling:**
+  - Form validation for required fields
+  - Error alerts for API failures
+  - Graceful handling of network issues
 
 ## Project Structure
 
@@ -57,6 +66,12 @@ frontend/
 ├── public/          # Static files
 ├── src/            # Source code
 │   ├── components/ # React components
+│   │   ├── BookList.tsx      # Main book list with modals
+│   │   ├── AddBookForm.tsx   # Add book modal form
+│   │   ├── EditBookForm.tsx  # Edit book modal form
+│   │   ├── BookDetails.tsx   # Book details view
+│   │   ├── Header.tsx        # Navigation header
+│   │   └── ErrorAlert.tsx    # Error display component
 │   ├── services/   # API service layer
 │   ├── config/     # Configuration files
 │   └── App.tsx     # Main application component

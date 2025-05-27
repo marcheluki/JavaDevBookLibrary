@@ -1,7 +1,7 @@
 # 📚 Final evaluation project: Book Management API and React Application
 
 ### Project Description
-The objective of this project is to create a book management system consisting of a microservice API developed using Java Spring Boot and a React application that consumes the API. The API will implement CRUD (Create, Read, Update, Delete) operations for managing book data and will be containerized using Docker.
+The objective of this project is to create a book management system consisting of a microservice API developed using Java Spring Boot and a React application that consumes the API. The API implements CRUD (Create, Read, Update, Delete) operations for managing book data and is containerized using Docker.
 
 ### Project Steps and Our Solution
 
@@ -9,125 +9,116 @@ We followed the outlined steps to build the full-stack application:
 
 **Part 1: Create the API Microservice**
 
-1.  **Set Up Project Structure:** A new directory was created, and a Spring Boot project was bootstrapped with Spring Web, Spring Data JPA, and H2 database dependencies.
-2.  **Define the Book Entity:** A `Book` class was created with necessary fields and JPA annotations.
-3.  **Create Repository Interface:** A `BookRepository` interface extending `JpaRepository` was implemented.
-4.  **Implement the Service Layer:** A `BookService` class was created to handle the CRUD logic.
-5.  **Create REST Controller:** A `BookController` class was implemented with the specified endpoints (`GET /books`, `GET /books/{id}`, `POST /books`, `PUT /books/{id}`, `DELETE /books/{id}`). The API endpoints are accessible under the `/api` path.
-6.  **Dockerize the API:** A `Dockerfile` was created for the Spring Boot application.
-7.  **Create a docker-compose.yml file:** A `docker-compose.yml` file was created to orchestrate the Spring Boot API service and a PostgreSQL database service (initially considered H2, but switched to PostgreSQL for persistence).
-8.  **Build and Run Docker Containers:** We configured a root `docker-compose.yml` to build and run both the API and Frontend containers together.
+1. **Set Up Project Structure:** A new directory was created, and a Spring Boot project was bootstrapped with Spring Web, Spring Data JPA, and PostgreSQL database dependencies.
+2. **Define the Book Entity:** A `Book` class was created with necessary fields (id, title, author, isbn, year, copies) and JPA annotations.
+3. **Create Repository Interface:** A `BookRepository` interface extending `JpaRepository` was implemented with custom query methods.
+4. **Implement the Service Layer:** A `BookService` class was created to handle the CRUD logic and business rules.
+5. **Create REST Controller:** A `BookController` class was implemented with the following endpoints:
+   - `GET /api/books`: Retrieve all books
+   - `GET /api/books/{id}`: Retrieve a book by ID
+   - `POST /api/books`: Insert a new book
+   - `PUT /api/books/{id}`: Update an existing book
+   - `DELETE /api/books/{id}`: Delete a book
+   - Additional endpoints for searching by title, author, and year
+6. **Dockerize the API:** A `Dockerfile` was created for the Spring Boot application.
+7. **Create a docker-compose.yml file:** A `docker-compose.yml` file was created to orchestrate the Spring Boot API service and PostgreSQL database service.
+8. **Build and Run Docker Containers:** We configured a root `docker-compose.yml` to build and run both the API and Frontend containers together.
 
 **Part 2: Create the React Application**
 
-1.  **Set Up Project Structure:** A new directory for the React application was created using Create React App.
-2.  **Install Necessary Dependencies:** Axios and Material-UI were installed for HTTP requests and UI components. `react-router-dom` was also installed for navigation.
-3.  **Create Components:** Components for `Header`, `BookList`, `BookDetails`, and `BookForm` were developed.
-4.  **Connect to the API:** Axios was used to interact with the API service, making sure to use the correct `/api` prefix for requests.
-5.  **Run the React Application:** The application is configured to run via Docker Compose, served by Nginx, which proxies API requests to the backend service.
+1. **Set Up Project Structure:** A new directory for the React application was created using Create React App with TypeScript.
+2. **Install Necessary Dependencies:** 
+   - Axios for HTTP requests
+   - Material-UI for UI components
+   - React Router for navigation
+   - TypeScript for type safety
+3. **Create Components:**
+   - `BookList`: Main component with a bookshelf-style interface and modal forms
+   - `AddBookForm`: Modal form for adding new books with validation
+   - `EditBookForm`: Modal form for editing books (ISBN field disabled)
+   - `BookDetails`: Detailed view of a single book
+   - `Header`: Navigation component
+   - `ErrorAlert`: Reusable error display component
+4. **Connect to the API:** Axios was used to interact with the API service, with proper error handling and loading states.
+5. **Run the React Application:** The application is configured to run via Docker Compose, served by Nginx, which proxies API requests to the backend service.
 
-During the development and integration process, we addressed several issues, including Docker build errors related to Node.js versions and npm dependencies, frontend-backend communication issues due to incorrect API base URL and Nginx configuration, and frontend UI/UX improvements like adding an Add Book modal, changing the Edit Book flow to a modal, implementing Snackbar notifications for success messages, and ensuring the book list updates automatically after add/delete operations without requiring a page refresh.
+### Key Features Implemented
 
-## 🔍 Full-Stack Project Overview
+1. **API Features:**
+   - Full CRUD operations for books
+   - Search functionality by title, author, and year
+   - Data validation and error handling
+   - PostgreSQL database integration
+   - Docker containerization
 
-The Library Management System is a full-stack application consisting of a Java Spring Boot API backend and a React frontend, both containerized with Docker and orchestrated using Docker Compose. This system allows users to manage a collection of books through a web interface.
+2. **Frontend Features:**
+   - Modern, responsive UI with Material-UI
+   - Bookshelf-style book list
+   - Modal forms for add/edit operations
+   - Form validation
+   - Real-time updates without page refresh
+   - Error handling and user feedback
+   - TypeScript for type safety
+   - Nginx for serving static files and API proxying
 
-## 💾 Full-Stack Project Data Persistence
+3. **User Experience Improvements:**
+   - Modal-based forms for better workflow
+   - Snackbar notifications for operation feedback
+   - Disabled ISBN field in edit mode to prevent data inconsistency
+   - Visual separation between books in the list
+   - Immediate feedback on operations
+   - Error alerts for failed operations
 
-Data persistence for the book information is handled by a PostgreSQL database, managed as a service within the Docker Compose setup. The API interacts with this database using Spring Data JPA.
+4. **Development Features:**
+   - Docker Compose for easy deployment
+   - Development and production configurations
+   - API request logging in development
+   - TypeScript for better code quality
+   - Component-based architecture
 
-## ✨ Full-Stack Project Key Features
+### How to Run
 
--   **Full-Stack Architecture:** A decoupled backend API and frontend React application.
--   **Containerization:** Both API and Frontend are containerized using Docker.
--   **Orchestration:** Docker Compose is used to build, run, and manage the multi-container application (API, Database, Frontend/Nginx).
--   **📖 Book Management (via API and Frontend):**
-    -   **Retrieve Books:** View a list of all books.
-    -   **View Book Details:** See details for a specific book.
-    -   **Add Books:** Add new books using a form in a modal on the book list page.
-    -   **Update Books:** Edit existing book details using a form in a modal on the book list page.
-    -   **Delete Books:** Remove books from the collection.
--   **Responsive UI:** React frontend built with Material-UI components.
--   **Improved User Experience:**
-    -   Dedicated Home page.
-    -   Integrated Add and Edit book forms as modals on the Books list page.
-    -   Snackbar notifications for successful operations.
-    -   Automatic list updates after adding or deleting books.
+1. **Clone the repository:**
+   ```bash
+   git clone <repository_url>
+   ```
 
-## 🎯 Full-Stack Project Objectives
+2. **Navigate to the project root:**
+   ```bash
+   cd JavaDevBookLibrary
+   ```
 
--   **Object-Oriented Programming (OOP):** Demonstrates OOP principles in the Java API design.
--   **RESTful API Development:** Implementation of CRUD endpoints using Spring Boot.
--   **Frontend Development with React:** Building a single-page application to consume the API.
--   **Containerization with Docker:** Packaging the API and Frontend into Docker images.
--   **Orchestration with Docker Compose:** Defining and running the multi-container application.
--   **Database Integration:** Connecting the API to a PostgreSQL database.
--   **Improved User Interface:** Enhancing the frontend with better navigation and workflows.
+3. **Build and run with Docker Compose:**
+   ```bash
+   docker-compose up --build
+   ```
 
-## 🚀 How to Run the Full-Stack Application
+4. **Access the application:**
+   - Frontend: http://localhost
+   - API: http://localhost/api
 
-The application can be built and run using Docker Compose from the root directory of the project.
-
-1.  **Clone the repository:**
-
-    ```bash
-    git clone <repository_url>
-    ```
-
-2.  **Navigate to the project root directory:**
-
-    ```bash
-    cd JavaDevBookLibrary
-    ```
-
-3.  **Build and run the Docker containers:**
-
-    ```bash
-    docker-compose up --build
-    ```
-
-    This command will build the Docker images for the API and Frontend (if not already built or if changes are detected) and start the API, Database, and Frontend services.
-
-4.  **Access the application:**
-
-    -   Frontend: Open your web browser and go to `http://localhost`.
-    -   API: The API is available internally within the Docker network and is exposed via the frontend's Nginx proxy at `http://localhost/api`. Direct access to the API service is at `http://localhost:8080/api`.
-
-5.  **Stop the application:**
-
-    To stop the running containers, press `Ctrl+C` in the terminal where `docker-compose up` is running. To stop and remove the containers, networks, and volumes, run:
-
-    ```bash
-    docker-compose down -v
-    ```
-
-## 📂 Project Structure (Full-Stack and Console App)
+### Project Structure
 
 ```
 JavaDevBookLibrary/
-├── src/ ... (Original console app source)
-├── api/ # Spring Boot API microservice
-│   ├── src/ ...
+├── api/                    # Spring Boot API
+│   ├── src/
+│   │   ├── main/java/com/library/api/
+│   │   │   ├── controller/  # REST controllers
+│   │   │   ├── service/     # Business logic
+│   │   │   ├── repository/  # Data access
+│   │   │   └── model/       # Entity classes
+│   │   └── resources/       # Configuration
 │   ├── Dockerfile
 │   └── pom.xml
-├── frontend/ # React application
-│   ├── public/ ...
-│   ├── src/ ...
+├── frontend/              # React application
+│   ├── src/
+│   │   ├── components/    # React components
+│   │   ├── services/      # API services
+│   │   └── config/        # Configuration
 │   ├── Dockerfile
-│   ├── nginx.conf
-│   ├── package.json
-│   └── ...
-├── docker-compose.yml # Root Docker Compose file
-├── README.md          # Main project README
-├── .git/ ...
-├── .gradle/ ...
-├── target/ ...
-├── lib/ ...
-├── books.txt          # Original console app data
-├── patrons.txt        # Original console app data
-├── librarians.txt     # Original console app data
-├── settings.xml
-└── build.gradle
+│   └── nginx.conf
+└── docker-compose.yml     # Root Docker Compose
 ```
 
 ---

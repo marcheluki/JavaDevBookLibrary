@@ -1,21 +1,20 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Container, Typography, List, ListItem, ListItemText, Box, IconButton, CircularProgress, Button } from '@mui/material';
+import { Container, Typography, List, ListItem, Box, IconButton, CircularProgress, Button } from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
-import { useNavigate } from 'react-router-dom';
 import { Book, bookService } from '../services/bookService';
 import { useApi } from '../hooks/useApi';
 import ErrorAlert from './ErrorAlert';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
-import BookForm from './BookForm';
+import AddBookForm from './AddBookForm';
+import EditBookForm from './EditBookForm';
 import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import CloseIcon from '@mui/icons-material/Close';
 
 const BookList: React.FC = () => {
-  const navigate = useNavigate();
   // We will manage books state locally now
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
@@ -23,7 +22,7 @@ const BookList: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Use useApi only for delete operation now
-  const { execute: deleteBookExecute, loading: deleting, error: deleteError, reset: resetDelete } = useApi<void>();
+  const { execute: deleteBookExecute, error: deleteError, reset: resetDelete } = useApi<void>();
 
   // State for the Add Book modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
@@ -222,7 +221,7 @@ const BookList: React.FC = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          <BookForm onSubmit={handleAddBookSubmit} onCancel={handleCloseAddModal} />
+          <AddBookForm onSubmit={handleAddBookSubmit} onCancel={handleCloseAddModal} />
         </DialogContent>
       </Dialog>
 
@@ -244,9 +243,13 @@ const BookList: React.FC = () => {
           </IconButton>
         </DialogTitle>
         <DialogContent>
-          {/* Pass the book id to BookForm for fetching data and handle update submit */}
+          {/* Pass the book data to EditBookForm */}
           {editingBookId !== null && (
-             <BookForm id={editingBookId.toString()} onSubmit={handleEditBookSubmit} onCancel={handleCloseEditModal} />
+            <EditBookForm 
+              book={books.find(book => book.id === editingBookId)} 
+              onSubmit={handleEditBookSubmit} 
+              onCancel={handleCloseEditModal} 
+            />
           )}
         </DialogContent>
       </Dialog>
