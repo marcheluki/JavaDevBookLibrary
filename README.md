@@ -59,6 +59,8 @@ Data persistence for the book information is handled by a PostgreSQL database, m
 
 ![Book List Page](./images/BooksPageReact.png)
 
+![Frontend Demo GIF](./images/FrontendDemo.gif)
+
 -   **Comprehensive Testing:**
     -   Frontend tests using React Testing Library
     -   Async operation testing with proper error handling
