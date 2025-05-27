@@ -33,6 +33,8 @@ During the development and integration process, we addressed several issues, inc
 
 The Library Management System is a full-stack application consisting of a Java Spring Boot API backend and a React frontend, both containerized with Docker and orchestrated using Docker Compose. This system allows users to manage a collection of books through a web interface.
 
+![Docker Containers Running](./images/FrontAndBackDockerRunning.png)
+
 ## 💾 Full-Stack Project Data Persistence
 
 Data persistence for the book information is handled by a PostgreSQL database, managed as a service within the Docker Compose setup. The API interacts with this database using Spring Data JPA.
@@ -54,6 +56,9 @@ Data persistence for the book information is handled by a PostgreSQL database, m
     -   Integrated Add and Edit book forms as modals on the Books list page.
     -   Snackbar notifications for successful operations.
     -   Automatic list updates after adding or deleting books.
+
+![Book List Page](./images/BooksPageReact.png)
+
 -   **Comprehensive Testing:**
     -   Frontend tests using React Testing Library
     -   Async operation testing with proper error handling
