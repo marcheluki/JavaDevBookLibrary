@@ -21,6 +21,20 @@ You will also see any lint errors in the console.
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.
+The test suite includes comprehensive tests for all major components and features:
+
+- Book list rendering with bookshelf styling
+- Add book modal and creation flow
+- Edit book modal and update flow
+- Delete operation with confirmation
+- Error state handling
+
+Tests follow React Testing Library best practices:
+- Async operations handled with `waitFor`
+- Side effects separated from assertions
+- Proper error handling and mocking
+- Clean test output with console error suppression
+
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
@@ -58,6 +72,12 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
   - Form validation for required fields
   - Error alerts for API failures
   - Graceful handling of network issues
+- **Testing:**
+  - Comprehensive test suite for all components
+  - Async operation testing with proper error handling
+  - Clean test output with console error suppression
+  - React Testing Library best practices
+  - Future-proof React Router v7 compatibility
 
 ## Project Structure
 
@@ -88,6 +108,7 @@ The frontend is built with:
 - Material-UI
 - Axios for API communication
 - React Router for navigation
+- React Testing Library for testing
 
 ## Docker
 
