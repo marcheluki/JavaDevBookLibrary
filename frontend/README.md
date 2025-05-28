@@ -21,20 +21,6 @@ You will also see any lint errors in the console.
 ### `npm test`
 
 Launches the test runner in the interactive watch mode.
-The test suite includes comprehensive tests for all major components and features:
-
-- Book list rendering with bookshelf styling
-- Add book modal and creation flow
-- Edit book modal and update flow
-- Delete operation with confirmation
-- Error state handling
-
-Tests follow React Testing Library best practices:
-- Async operations handled with `waitFor`
-- Side effects separated from assertions
-- Proper error handling and mocking
-- Clean test output with console error suppression
-
 See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
 ### `npm run build`
@@ -64,6 +50,9 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
   - Modal forms for add/edit operations
   - Snackbar notifications for operation feedback
   - Bookshelf-style list view with visual separation between books
+  - Updated UI colors for header, buttons, and icons for a cohesive look.
+  - Full-width background image on the Home page.
+  - Dedicated Search page with real-time search results.
 - **Real-time Updates:**
   - Automatic list refresh after add/update/delete operations
   - No page refresh required
@@ -72,32 +61,37 @@ See the section about [deployment](https://facebook.github.io/create-react-app/d
   - Form validation for required fields
   - Error alerts for API failures
   - Graceful handling of network issues
-- **Testing:**
-  - Comprehensive test suite for all components
-  - Async operation testing with proper error handling
-  - Clean test output with console error suppression
-  - React Testing Library best practices
-  - Future-proof React Router v7 compatibility
 
 ## Project Structure
 
 ```
 frontend/
-├── public/          # Static files
-├── src/            # Source code
-│   ├── components/ # React components
-│   │   ├── BookList.tsx      # Main book list with modals
-│   │   ├── AddBookForm.tsx   # Add book modal form
-│   │   ├── EditBookForm.tsx  # Edit book modal form
-│   │   ├── BookDetails.tsx   # Book details view
-│   │   ├── Header.tsx        # Navigation header
-│   │   └── ErrorAlert.tsx    # Error display component
+├── .babelrc
+├── .gitignore
+├── build/
+├── Dockerfile
+├── jest.config.js
+├── node_modules/
+├── nginx.conf
+├── package.json
+├── package-lock.json
+├── public/
+│   └── images/ # For static assets like the background image
+├── src/
+│   ├── components/
+│   │   ├── BookList.tsx
+│   │   ├── AddBookForm.tsx
+│   │   ├── EditBookForm.tsx
+│   │   ├── BookDetails.tsx
+│   │   ├── Header.tsx
+│   │   └── ErrorAlert.tsx
+│   ├── hooks/ # Custom hooks (e.g., useDebounce)
+│   ├── pages/ # Dedicated pages (e.g., SearchPage)
+│   │   └── SearchPage.tsx
 │   ├── services/   # API service layer
 │   ├── config/     # Configuration files
 │   └── App.tsx     # Main application component
-├── Dockerfile      # Docker configuration
-├── nginx.conf      # Nginx configuration
-└── package.json    # Project dependencies
+└── tsconfig.json
 ```
 
 ## Development
@@ -108,7 +102,6 @@ The frontend is built with:
 - Material-UI
 - Axios for API communication
 - React Router for navigation
-- React Testing Library for testing
 
 ## Docker
 

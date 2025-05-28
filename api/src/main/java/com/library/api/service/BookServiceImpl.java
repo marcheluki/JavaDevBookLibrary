@@ -8,6 +8,10 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.ArrayList;
 
 @Service
 @Transactional
@@ -157,5 +161,24 @@ public class BookServiceImpl implements BookService {
 
         book.setCopies(copies);
         bookRepository.save(book);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Book> searchBooks(String query) {
+        if (query == null || query.trim().isEmpty()) {
+            throw new IllegalArgumentException("Search query cannot be empty");
+        }
+
+        // Search in both title and author
+        List<Book> titleResults = bookRepository.findByTitleContainingIgnoreCase(query);
+        List<Book> authorResults = bookRepository.findByAuthorContainingIgnoreCase(query);
+
+        // Combine results and remove duplicates using a Set
+        Set<Book> uniqueResults = new HashSet<>();
+        uniqueResults.addAll(titleResults);
+        uniqueResults.addAll(authorResults);
+
+        return new ArrayList<>(uniqueResults);
     }
 }

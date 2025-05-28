@@ -30,4 +30,7 @@ public interface BookService {
     boolean isBookAvailable(String isbn);
 
     void updateBookCopies(String isbn, int copies);
+
+    // Search Operations
+    List<Book> searchBooks(String query);
 }

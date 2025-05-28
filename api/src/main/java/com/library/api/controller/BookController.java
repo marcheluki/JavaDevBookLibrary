@@ -119,4 +119,14 @@ public class BookController {
             return ResponseEntity.badRequest().build();
         }
     }
+
+    @GetMapping("/search")
+    public ResponseEntity<List<Book>> searchBooks(@RequestParam String query) {
+        try {
+            List<Book> books = bookService.searchBooks(query);
+            return ResponseEntity.ok(books);
+        } catch (IllegalArgumentException e) {
+            return ResponseEntity.badRequest().build();
+        }
+    }
 }

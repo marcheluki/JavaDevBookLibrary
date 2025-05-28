@@ -53,23 +53,29 @@ describe('BookList', () => {
     );
   };
 
-  it('renders book list with bookshelf styling', async () => {
+  it('renders book list with card layout', async () => {
     renderComponent();
 
     // Check loading state
     expect(screen.getByRole('progressbar')).toBeInTheDocument();
 
-    // Wait for first book to load
+    // Wait for books to load
     await waitFor(() => {
       expect(screen.getByText('Book 1')).toBeInTheDocument();
     });
 
+    // Check for book details in card format
+    expect(screen.getByText('By Author 1')).toBeInTheDocument();
+    expect(screen.getByText('ISBN: 123')).toBeInTheDocument();
+    expect(screen.getByText('Year: 2020')).toBeInTheDocument();
+    expect(screen.getByText('1 copies available')).toBeInTheDocument();
+
     // Check second book
     expect(screen.getByText('Book 2')).toBeInTheDocument();
-
-    // Check for bookshelf styling
-    expect(screen.getByText('by Author 1 (2020)')).toBeInTheDocument();
-    expect(screen.getByText('by Author 2 (2021)')).toBeInTheDocument();
+    expect(screen.getByText('By Author 2')).toBeInTheDocument();
+    expect(screen.getByText('ISBN: 456')).toBeInTheDocument();
+    expect(screen.getByText('Year: 2021')).toBeInTheDocument();
+    expect(screen.getByText('2 copies available')).toBeInTheDocument();
   });
 
   it('opens add book modal and creates new book', async () => {
@@ -129,14 +135,10 @@ describe('BookList', () => {
     const editButtons = screen.getAllByTestId('EditIcon');
     fireEvent.click(editButtons[0]);
 
-    // Wait for modal to open and check pre-filled data
+    // Wait for modal to open
     await waitFor(() => {
       expect(screen.getByRole('dialog')).toBeInTheDocument();
     });
-
-    expect(screen.getByDisplayValue('Book 1')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('Author 1')).toBeInTheDocument();
-    expect(screen.getByDisplayValue('123')).toBeInTheDocument();
 
     // Update the title
     fireEvent.change(screen.getByLabelText(/title/i), { target: { value: 'Updated Book' } });
@@ -145,13 +147,16 @@ describe('BookList', () => {
     const submitButton = screen.getByRole('button', { name: 'Update Book' });
     fireEvent.click(submitButton);
 
-    // Verify update was called
+    // Verify update was called with the correct book data
     await waitFor(() => {
-      expect(bookService.updateBook).toHaveBeenCalledWith(1, expect.objectContaining({
+      expect(bookService.updateBook).toHaveBeenCalledWith(1, {
+        id: 1,
         title: 'Updated Book',
         author: 'Author 1',
-        isbn: '123'
-      }));
+        isbn: '123',
+        year: 2020,
+        copies: 1
+      });
     });
 
     // Verify success message
@@ -160,7 +165,7 @@ describe('BookList', () => {
     });
   });
 
-  it('handles delete operation with confirmation', async () => {
+  it('handles delete operation', async () => {
     renderComponent();
 
     // Wait for books to load

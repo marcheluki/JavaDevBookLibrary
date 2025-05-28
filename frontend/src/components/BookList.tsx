@@ -1,36 +1,37 @@
 import React, { useEffect, useState, useCallback } from 'react';
-import { Container, Typography, List, ListItem, Box, IconButton, CircularProgress, Button } from '@mui/material';
+import { 
+  Container, 
+  Typography, 
+  Box, 
+  IconButton, 
+  CircularProgress, 
+  Button,
+  Grid,
+  Card,
+  CardContent,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  Snackbar,
+  Alert
+} from '@mui/material';
 import DeleteIcon from '@mui/icons-material/Delete';
 import EditIcon from '@mui/icons-material/Edit';
+import BookIcon from '@mui/icons-material/Book';
 import { Book, bookService } from '../services/bookService';
 import { useApi } from '../hooks/useApi';
 import ErrorAlert from './ErrorAlert';
-import Dialog from '@mui/material/Dialog';
-import DialogTitle from '@mui/material/DialogTitle';
-import DialogContent from '@mui/material/DialogContent';
 import AddBookForm from './AddBookForm';
 import EditBookForm from './EditBookForm';
-import Snackbar from '@mui/material/Snackbar';
-import Alert from '@mui/material/Alert';
-import CloseIcon from '@mui/icons-material/Close';
 
 const BookList: React.FC = () => {
-  // We will manage books state locally now
   const [books, setBooks] = useState<Book[]>([]);
   const [loading, setLoading] = useState<boolean>(true);
-  // Keep error state for fetching initial list and delete operations
   const [error, setError] = useState<string | null>(null);
-
-  // Use useApi only for delete operation now
   const { execute: deleteBookExecute, error: deleteError, reset: resetDelete } = useApi<void>();
-
-  // State for the Add Book modal
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
-  // State for the Edit Book modal
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const [editingBookId, setEditingBookId] = useState<number | null>(null);
-
-  // State for Snackbar success message
   const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
 
@@ -48,84 +49,69 @@ const BookList: React.FC = () => {
     }
   }, []);
 
-  // Fetch books on component mount
   useEffect(() => {
     fetchBooks();
-  }, [fetchBooks]); // Added fetchBooks to dependency array as it's now wrapped in useCallback
+  }, [fetchBooks]);
 
   const handleDelete = async (id: number) => {
     try {
       await deleteBookExecute(async () => {
         await bookService.deleteBook(id);
       });
-      // Update state directly after deletion
       setBooks(prevBooks => prevBooks.filter(book => book.id !== id));
       setSnackbarMessage('Book deleted successfully!');
       setSnackbarOpen(true);
     } catch (err) {
       console.error('Error in handleDelete:', err);
-      // Error is handled by the useApi hook and displayed by ErrorAlert
     }
   };
 
   const handleEdit = (id: number) => {
-    // Open the edit modal instead of navigating
     setEditingBookId(id);
     setIsEditModalOpen(true);
-    // Reset errors related to BookList operations when opening modal
     setError(null);
-    resetDelete(); // Also reset delete errors if any
+    resetDelete();
   };
 
-  // Handle opening and closing the Add Book modal
   const handleOpenAddModal = () => {
     setIsAddModalOpen(true);
-    // Reset errors related to BookList operations when opening modal
     setError(null);
-    resetDelete(); // Also reset delete errors if any
+    resetDelete();
   };
 
   const handleCloseAddModal = () => {
     setIsAddModalOpen(false);
   };
 
-  // Handle closing the Edit Book modal
   const handleCloseEditModal = () => {
     setIsEditModalOpen(false);
-    setEditingBookId(null); // Clear the editing book ID
+    setEditingBookId(null);
   };
 
-  // Handle submitting the form in the Add Book modal
   const handleAddBookSubmit = async (bookData: Omit<Book, 'id'>) => {
     try {
       const newBook = await bookService.createBook(bookData);
-      // Update state directly after adding
       setBooks(prevBooks => [...prevBooks, newBook]);
       setSnackbarMessage('Book added successfully!');
       setSnackbarOpen(true);
-      handleCloseAddModal(); // Close the modal on success
+      handleCloseAddModal();
     } catch (err) {
       console.error('Error adding book:', err);
-      // Error is now handled and displayed by the BookForm component within the modal
     }
   };
 
-  // Handle submitting the form in the Edit Book modal
   const handleEditBookSubmit = async (bookData: Book) => {
     try {
       const updatedBook = await bookService.updateBook(bookData.id!, bookData);
-      // Update state directly after editing
       setBooks(prevBooks => prevBooks.map(book => book.id === updatedBook.id ? updatedBook : book));
       setSnackbarMessage('Book updated successfully!');
       setSnackbarOpen(true);
-      handleCloseEditModal(); // Close the modal on success
+      handleCloseEditModal();
     } catch (err) {
       console.error('Error updating book:', err);
-      // Error is now handled and displayed by the BookForm component within the modal
     }
   };
 
-  // Handle Snackbar close
   const handleSnackbarClose = (event?: React.SyntheticEvent | Event, reason?: string) => {
     if (reason === 'clickaway') {
       return;
@@ -141,112 +127,120 @@ const BookList: React.FC = () => {
     );
   }
 
-  // Combine errors from initial fetching and deleting
   const currentError = error || deleteError;
 
   return (
-    <Container sx={{ backgroundColor: '#ffffff', padding: 3 }}>
-      <Typography variant="h4" gutterBottom>
-        Book List
-      </Typography>
-      {/* Add Button to open Add Book Modal */}
-      <Button variant="contained" sx={{ mb: 2 }} onClick={handleOpenAddModal}>
-        Add New Book
-      </Button>
-
-      {/* Display errors from fetching or deleting */}
-      {currentError && <ErrorAlert error={currentError} onClose={() => { setError(null); resetDelete(); }} />}
-      
-      {/* Bookshelf Styling */}
-      <List sx={{ 
-        border: '1px solid #d3d3d3', 
-        borderRadius: '4px', 
-        backgroundColor: '#f5f5dc', // Beige color for bookshelf background
-        padding: 2
-      }}>
-        {books.length === 0 && !loading && !currentError ? (
-          <Typography variant="h6" sx={{ textAlign: 'center' }}>No books available.</Typography>
-        ) : (
-          books?.map((book) => (
-            <ListItem 
-              key={book.id} 
-              sx={
-                {
-                  borderBottom: '1px solid #d3d3d3', // Shelf line
-                  '&:last-child': { borderBottom: 'none' },
-                  paddingY: 1,
-                  backgroundColor: '#ffffff', // White background for each book item
-                  marginY: 1, // Space between books
-                  borderRadius: '4px',
-                  boxShadow: '0 1px 3px rgba(0,0,0,0.1)', // Subtle shadow for book effect
-                  display: 'flex', // Use flex to align items
-                  alignItems: 'center', // Vertically align items
-                }
-              }
-            >
-              <Box sx={{ flexGrow: 1 }}> {/* Allow text to take available space */}
-                <Typography variant="h6">{book.title}</Typography>
-                <Typography variant="body2" color="textSecondary">
-                  by {book.author} ({book.year})
-                </Typography>
-              </Box>
-              <Box>
-                <IconButton onClick={() => handleEdit(book.id!)} color="primary">
-                  <EditIcon />
-                </IconButton>
-                <IconButton onClick={() => handleDelete(book.id!)} color="error">
-                  <DeleteIcon />
-                </IconButton>
-              </Box>
-            </ListItem>
-          ))
-        )}
-      </List>
-
-      {/* Add Book Dialog/Modal */}
-      <Dialog open={isAddModalOpen} onClose={handleCloseAddModal} fullWidth maxWidth="sm">
-        <DialogTitle>
+    <Container maxWidth="lg" sx={{ py: 4 }}>
+      <Box display="flex" justifyContent="space-between" alignItems="center" mb={4}>
+        <Typography variant="h3" component="h1">
+          Book Collection
+        </Typography>
+        <Button 
+          variant="contained" 
+          color="primary" 
+          onClick={handleOpenAddModal}
+          sx={{
+            backgroundColor: '#185519',
+            borderRadius: 2,
+            textTransform: 'none',
+            px: 3
+          }}
+        >
           Add New Book
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseAddModal}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-             <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+        </Button>
+      </Box>
+
+      {currentError && (
+        <ErrorAlert 
+          error={currentError} 
+          onClose={() => { setError(null); resetDelete(); }} 
+        />
+      )}
+
+      {books.length === 0 && !loading && !currentError ? (
+        <Typography variant="h6" align="center" color="textSecondary">
+          No books available.
+        </Typography>
+      ) : (
+        <Grid container spacing={3}>
+          {books.map((book) => (
+            <Grid item xs={12} sm={6} md={4} key={book.id}>
+              <Card 
+                elevation={2}
+                sx={{
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  transition: 'transform 0.2s, box-shadow 0.2s',
+                  '&:hover': {
+                    transform: 'translateY(-4px)',
+                    boxShadow: 4,
+                  },
+                }}
+              >
+                <CardContent>
+                  <Box display="flex" alignItems="center" mb={2}>
+                    <BookIcon sx={{ mr: 1, color: '#A0C878' }} />
+                    <Typography variant="h6" component="h2" noWrap>
+                      {book.title}
+                    </Typography>
+                  </Box>
+                  <Typography color="textSecondary" gutterBottom>
+                    By {book.author}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" paragraph>
+                    ISBN: {book.isbn}
+                  </Typography>
+                  <Typography variant="body2" color="textSecondary" paragraph>
+                    Year: {book.year}
+                  </Typography>
+                  <Box display="flex" justifyContent="space-between" alignItems="center">
+                    <Typography 
+                      variant="body2" 
+                      color={book.copies > 0 ? 'success.main' : 'error.main'}
+                      sx={{ fontWeight: 'bold' }}
+                    >
+                      {book.copies > 0 ? `${book.copies} copies available` : 'No copies available'}
+                    </Typography>
+                    <Box>
+                      <IconButton 
+                        onClick={() => handleEdit(book.id!)} 
+                        sx={{ color: '#597445' }}
+                        size="small"
+                      >
+                        <EditIcon />
+                      </IconButton>
+                      <IconButton 
+                        onClick={() => handleDelete(book.id!)} 
+                        color="error"
+                        size="small"
+                      >
+                        <DeleteIcon />
+                      </IconButton>
+                    </Box>
+                  </Box>
+                </CardContent>
+              </Card>
+            </Grid>
+          ))}
+        </Grid>
+      )}
+
+      {/* Add Book Modal */}
+      <Dialog open={isAddModalOpen} onClose={handleCloseAddModal} maxWidth="sm" fullWidth>
+        <DialogTitle>Add New Book</DialogTitle>
         <DialogContent>
           <AddBookForm onSubmit={handleAddBookSubmit} onCancel={handleCloseAddModal} />
         </DialogContent>
       </Dialog>
 
-      {/* Edit Book Dialog/Modal */}
-      <Dialog open={isEditModalOpen} onClose={handleCloseEditModal} fullWidth maxWidth="sm">
-        <DialogTitle>
-          Edit Book
-          <IconButton
-            aria-label="close"
-            onClick={handleCloseEditModal}
-            sx={{
-              position: 'absolute',
-              right: 8,
-              top: 8,
-              color: (theme) => theme.palette.grey[500],
-            }}
-          >
-             <CloseIcon />
-          </IconButton>
-        </DialogTitle>
+      {/* Edit Book Modal */}
+      <Dialog open={isEditModalOpen} onClose={handleCloseEditModal} maxWidth="sm" fullWidth>
+        <DialogTitle>Edit Book</DialogTitle>
         <DialogContent>
-          {/* Pass the book data to EditBookForm */}
-          {editingBookId !== null && (
+          {editingBookId && (
             <EditBookForm 
-              book={books.find(book => book.id === editingBookId)} 
+              book={books.find(b => b.id === editingBookId)}
               onSubmit={handleEditBookSubmit} 
               onCancel={handleCloseEditModal} 
             />
@@ -254,8 +248,13 @@ const BookList: React.FC = () => {
         </DialogContent>
       </Dialog>
 
-      {/* Success Snackbar */}
-      <Snackbar open={snackbarOpen} autoHideDuration={6000} onClose={handleSnackbarClose}>
+      {/* Snackbar for success messages */}
+      <Snackbar
+        open={snackbarOpen}
+        autoHideDuration={6000}
+        onClose={handleSnackbarClose}
+        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
+      >
         <Alert onClose={handleSnackbarClose} severity="success" sx={{ width: '100%' }}>
           {snackbarMessage}
         </Alert>

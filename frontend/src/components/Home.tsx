@@ -5,21 +5,25 @@ const Home: React.FC = () => {
   return (
     <Box
       sx={{
-        minHeight: 'calc(100vh - 64px)', // Adjust based on your header height
-        backgroundColor: '#ffffff', // Changed to white
+        width: '100vw',            // ancho completo
+        height: 'calc(100vh - 64px)', // alto completo menos header (64px)
+        backgroundImage: 'url(/image/backgroundPhoto.png)',
+        backgroundSize: 'cover',
+        backgroundPosition: 'center',
+        backgroundRepeat: 'no-repeat',
         display: 'flex',
         flexDirection: 'column',
         justifyContent: 'center',
         alignItems: 'center',
         textAlign: 'center',
-        padding: 4,
+        backgroundColor: 'rgba(255,255,255,0.5)',
       }}
     >
       <Container maxWidth="md">
-        <Typography variant="h2" component="h1" gutterBottom>
+        <Typography variant="h2" component="h1" gutterBottom sx={{ color: 'white' }}>
           Welcome to the Library App!
         </Typography>
-        <Typography variant="h5" component="p">
+        <Typography variant="h5" component="p" sx={{ color: 'white' }}>
           Discover and manage your book collection with ease.
         </Typography>
         {/* You can add images of books here */}

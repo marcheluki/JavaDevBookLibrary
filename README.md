@@ -25,15 +25,12 @@ We followed the outlined steps to build the full-stack application:
 3.  **Create Components:** Components for `Header`, `BookList`, `BookDetails`, and `BookForm` were developed.
 4.  **Connect to the API:** Axios was used to interact with the API service, making sure to use the correct `/api` prefix for requests.
 5.  **Run the React Application:** The application is configured to run via Docker Compose, served by Nginx, which proxies API requests to the backend service.
-6.  **Implement Testing:** Comprehensive test suite was created using React Testing Library, following best practices for async operations, error handling, and future-proof React Router v7 compatibility.
 
 During the development and integration process, we addressed several issues, including Docker build errors related to Node.js versions and npm dependencies, frontend-backend communication issues due to incorrect API base URL and Nginx configuration, and frontend UI/UX improvements like adding an Add Book modal, changing the Edit Book flow to a modal, implementing Snackbar notifications for success messages, and ensuring the book list updates automatically after add/delete operations without requiring a page refresh.
 
 ## 🔍 Full-Stack Project Overview
 
 The Library Management System is a full-stack application consisting of a Java Spring Boot API backend and a React frontend, both containerized with Docker and orchestrated using Docker Compose. This system allows users to manage a collection of books through a web interface.
-
-![Docker Containers Running](./images/FrontAndBackDockerRunning.png)
 
 ## 💾 Full-Stack Project Data Persistence
 
@@ -56,15 +53,7 @@ Data persistence for the book information is handled by a PostgreSQL database, m
     -   Integrated Add and Edit book forms as modals on the Books list page.
     -   Snackbar notifications for successful operations.
     -   Automatic list updates after adding or deleting books.
-
-![Book List Page](./images/BooksPageReact.png)
-
--   **Comprehensive Testing:**
-    -   Frontend tests using React Testing Library
-    -   Async operation testing with proper error handling
-    -   Clean test output with console error suppression
-    -   Future-proof React Router v7 compatibility
-    -   Backend tests using JUnit 5
+    -   Customizable UI colors for header, buttons, and icons.
 
 ## 🎯 Full-Stack Project Objectives
 
@@ -75,7 +64,7 @@ Data persistence for the book information is handled by a PostgreSQL database, m
 -   **Orchestration with Docker Compose:** Defining and running the multi-container application.
 -   **Database Integration:** Connecting the API to a PostgreSQL database.
 -   **Improved User Interface:** Enhancing the frontend with better navigation and workflows.
--   **Quality Assurance:** Implementing comprehensive testing for both frontend and backend.
+-   **Advanced Search Functionality:** Implementing search by title and author in the backend using Java 8 features (including lambda expressions) and integrating a dedicated search page in the frontend.
 
 ## 🚀 How to Run the Full-Stack Application
 
@@ -118,29 +107,44 @@ The application can be built and run using Docker Compose from the root director
 
 ```
 JavaDevBookLibrary/
-├── src/ ... (Original console app source)
-├── api/ # Spring Boot API microservice
+├── .babelrc
+├── .classpath
+├── .git/
+├── .gitignore
+├── .gradle/
+├── .vscode/
+├── api/
 │   ├── src/ ...
 │   ├── Dockerfile
-│   └── pom.xml
-├── frontend/ # React application
+│   ├── docker-compose.yml # API-specific docker-compose
+│   ├── pom.xml # API Maven file
+│   ├── target/
+│   └── .dockerignore
+├── books.txt
+├── books.txt.standard
+├── build.gradle
+├── docker-compose.yml # Root Docker Compose file
+├── frontend/
 │   ├── public/ ...
 │   ├── src/ ...
 │   ├── Dockerfile
 │   ├── nginx.conf
 │   ├── package.json
-│   └── ...
-├── docker-compose.yml # Root Docker Compose file
-├── README.md          # Main project README
-├── .git/ ...
-├── .gradle/ ...
-├── target/ ...
-├── lib/ ...
-├── books.txt          # Original console app data
-├── patrons.txt        # Original console app data
-├── librarians.txt     # Original console app data
+│   ├── package-lock.json
+│   ├── jest.config.js
+│   ├── .babelrc
+│   ├── tsconfig.json
+│   ├── build/
+│   └── .gitignore
+├── images/
+├── lib/
+├── librarians.txt
+├── patrons.txt
+├── pom.xml # Root/Console App Maven file
+├── README.md
 ├── settings.xml
-└── build.gradle
+├── src/ # Original console app source
+└── target/ # Original console app build output
 ```
 
 ---
